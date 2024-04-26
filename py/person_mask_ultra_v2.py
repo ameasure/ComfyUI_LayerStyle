@@ -163,6 +163,7 @@ class PersonMaskUltraV2:
                 ret_image = RGB2RGBA(orig_image, _mask)
                 ret_images.append(pil2tensor(ret_image))
                 ret_masks.append(image2mask(_mask))
+                print(f'ret_image shape after pil2tensor {ret_images[-1].shape}')
                 print(f'_mask shape after image2mask {ret_masks[-1].shape}')
             log(f"{NODE_NAME} Processed {len(ret_images)} image(s).", message_type='finish')
             return (torch.cat(ret_images, dim=0), torch.cat(ret_masks, dim=0),)
