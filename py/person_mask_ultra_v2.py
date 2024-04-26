@@ -102,8 +102,6 @@ class PersonMaskUltraV2:
                 # Retrieve the masks for the segmented image
                 media_pipe_image = self.get_mediapipe_image(image=image_pil)
                 segmented_masks = segmenter.segment(media_pipe_image)
-                for smask in segmented_masks.confidence_masks:
-                    print(smask.shape)
                 masks = []
                 if background:
                     masks.append(segmented_masks.confidence_masks[0])
