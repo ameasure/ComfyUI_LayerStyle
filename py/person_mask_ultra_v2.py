@@ -88,12 +88,12 @@ class PersonMaskUltraV2:
         with mp.tasks.vision.ImageSegmenter.create_from_options(options) as segmenter:
             for image in images:
                 _image = torch.unsqueeze(image, 0)
+                print(f'_image tensor shape {_image.shape}')
                 orig_image = tensor2pil(_image).convert('RGB')
                 # Convert the Tensor to a PIL image
                 i = 255. * image.cpu().numpy()
                 image_pil = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
-                image_h = image_pil.size[0]
-                image_w = image_pil.size[1]
+                print(f'image_pil size {image_pil.size}')
                 # create our foreground and background arrays for storing the mask results
                 mask_background_array = np.zeros((image_pil.size[0], image_pil.size[1], 4), dtype=np.uint8)
                 mask_background_array[:] = (0, 0, 0, 255)
