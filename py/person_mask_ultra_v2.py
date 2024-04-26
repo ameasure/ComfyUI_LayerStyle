@@ -92,6 +92,8 @@ class PersonMaskUltraV2:
                 # Convert the Tensor to a PIL image
                 i = 255. * image.cpu().numpy()
                 image_pil = Image.fromarray(np.clip(i, 0, 255).astype(np.uint8))
+                image_h = image_pil.size[0]
+                image_w = image_pil.size[1]
                 # create our foreground and background arrays for storing the mask results
                 mask_background_array = np.zeros((image_pil.size[0], image_pil.size[1], 4), dtype=np.uint8)
                 mask_background_array[:] = (0, 0, 0, 255)
@@ -100,6 +102,8 @@ class PersonMaskUltraV2:
                 # Retrieve the masks for the segmented image
                 media_pipe_image = self.get_mediapipe_image(image=image_pil)
                 segmented_masks = segmenter.segment(media_pipe_image)
+                for smask in segmented_masks.confidence_masks:
+                    print(smask.shape)
                 masks = []
                 if background:
                     masks.append(segmented_masks.confidence_masks[0])
@@ -115,6 +119,7 @@ class PersonMaskUltraV2:
                     masks.append(segmented_masks.confidence_masks[5])
                 image_data = media_pipe_image.numpy_view()
                 image_shape = image_data.shape
+                print(f'media_pipe image data shape {image_data.shape}')
                 # convert the image shape from "rgb" to "rgba" aka add the alpha channel
                 if image_shape[-1] == 3:
                     image_shape = (image_shape[0], image_shape[1], 4)
@@ -132,6 +137,7 @@ class PersonMaskUltraV2:
                         mask_arrays.append(mask_array)
                 # Merge our masks taking the maximum from each
                 merged_mask_arrays = reduce(np.maximum, mask_arrays)
+                print(f'shape after reduce {merged_mask_arrays.shape}')
                 # Create the image
                 mask_image = Image.fromarray(merged_mask_arrays)
                 # convert PIL image to tensor image
@@ -155,11 +161,11 @@ class PersonMaskUltraV2:
                         _mask = tensor2pil(histogram_remap(pil2tensor(_mask), black_point, white_point))
                 else:
                     _mask = mask2image(_mask)
-
+                print(f'_mask shape after process_detailer {_mask.shape}')
                 ret_image = RGB2RGBA(orig_image, _mask)
-                ret_images.append(pil2tensor(ret_image))
+                ret_images.append(pil2tensor(ret_image)
                 ret_masks.append(image2mask(_mask))
-
+                print(f'_mask shape after image2mask {ret_masks[-1]}')
             log(f"{NODE_NAME} Processed {len(ret_images)} image(s).", message_type='finish')
             return (torch.cat(ret_images, dim=0), torch.cat(ret_masks, dim=0),)
 
