@@ -163,7 +163,7 @@ class PersonMaskUltraV2:
                     _mask = mask2image(_mask)
                 print(f'_mask shape after process_detailer {_mask.shape}')
                 ret_image = RGB2RGBA(orig_image, _mask)
-                ret_images.append(pil2tensor(ret_image)
+                ret_images.append(pil2tensor(ret_image))
                 ret_masks.append(image2mask(_mask))
                 print(f'_mask shape after image2mask {ret_masks[-1]}')
             log(f"{NODE_NAME} Processed {len(ret_images)} image(s).", message_type='finish')
